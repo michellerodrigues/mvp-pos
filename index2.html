@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FamilyTask - Gestão de Tarefas Domésticas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4a6fa5;
+            --secondary: #166088;
+            --accent: #4fc3f7;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --gray: #6c757d;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: var(--dark);
+        }
+        
+        .container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            grid-template-rows: 60px 1fr;
+            min-height: 100vh;
+        }
+        
+        /* Header */
+        header {
+            grid-column: 1 / 3;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        /* Sidebar */
+        aside {
+            background-color: white;
+            border-right: 1px solid #e0e0e0;
+            padding: 20px 0;
+        }
+        
+        .nav-menu {
+            list-style: none;
+        }
+        
+        .nav-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background-color: rgba(74, 111, 165, 0.1);
+            border-left: 3px solid var(--primary);
+        }
+        
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Main Content */
+        main {
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .card-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .card-value.currency {
+            color: var(--success);
+        }
+        
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        /* Tasks Section */
+        .tasks-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .task-list {
+            min-height: 400px;
+        }
+        
+        .task-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            transition: all 0.3s;
+        }
+        
+        .task-item:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .task-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .task-priority {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        
+        .priority-high {
+            background-color: var(--danger);
+        }
+        
+        .priority-medium {
+            background-color: var(--warning);
+        }
+        
+        .priority-low {
+            background-color: var(--success);
+        }
+        
+        .task-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            width: 500px;
+            max-width: 90%;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .modal-header {
+            padding: 15px 20px;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .modal-footer {
+            padding: 15px 20px;
+            background-color: #f9f9f9;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        /* Responsividade */
+        @media (max-width: 992px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            aside {
+                display: none;
+            }
+            
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .tasks-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="logo">FamilyTask</div>
+            <div class="user-info">
+                <span>Olá, Maria</span>
+                <div class="user-avatar">M</div>
+            </div>
+        </header>
+        
+        <!-- Sidebar -->
+        <aside>
+            <ul class="nav-menu">
+                <li class="nav-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-tasks"></i>
+                    <span>Tarefas</span>
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Agendamento</span>
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Membros</span>
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-user-nurse"></i>
+                    <span>Cuidadores</span>
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-coins"></i>
+                    <span>Moedas</span>
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Configurações</span>
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Sair</span>
+                </li>
+            </ul>
+        </aside>
+        
+        <!-- Main Content -->
+        <main>
+            <div class="dashboard">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Tarefas Pendentes</div>
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="card-value">15</div>
+                    <div class="card-footer">
+                        <span>+2 desde ontem</span>
+                        <button class="btn btn-outline">Ver todas</button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Tarefas Concluídas</div>
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="card-value">24</div>
+                    <div class="card-footer">
+                        <span>Esta semana</span>
+                        <button class="btn btn-outline">Ver todas</button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Moedas Acumuladas</div>
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <div class="card-value currency">1.250</div>
+                    <div class="card-footer">
+                        <span>Total disponível</span>
+                        <button class="btn btn-outline">Resgatar</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tasks-section">
+                <div class="card task-list">
+                    <div class="card-header">
+                        <div class="card-title">Tarefas a Fazer</div>
+                        <button class="btn btn-primary" id="newTaskBtn">
+                            <i class="fas fa-plus"></i> Nova Tarefa
+                        </button>
+                    </div>
+                    
+                    <div class="task-item">
+                        <div class="task-info">
+                            <div class="task-priority priority-high"></div>
+                            <div>
+                                <div class="task-title">Limpar o banheiro</div>
+                                <div class="task-meta">Hoje · Cuidados com a Casa</div>
+                            </div>
+                        </div>
+                        <div class="task-actions">
+                            <button class="btn btn-success"><i class="fas fa-check"></i></button>
+                            <button class="btn btn-outline"><i class="fas fa-edit"></i></button>
+                        </div>
+                    </div>
+                    
+                    <div class="task-item">
+                        <div class="task-info">
+                            <div class="task-priority priority-medium"></div>
+                            <div>
+                                <div class="task-title">Alimentar o cachorro</div>
+                                <div class="task-meta">Hoje · Cuidados com Animais</div>
+                            </div>
+                        </div>
+                        <div class="task-actions">
+                            <button class="btn btn-success"><i class="fas fa-check"></i></button>
+                            <button class="btn btn-outline"><i class="fas fa-edit"></i></button>
+                        </div>
+                    </div>
+                    
+                    <div class="task-item">
+                        <div class="task-info">
+                            <div class="task-priority priority-low"></div>
+                            <div>
+                                <div class="task-title">Regar as plantas</div>
+                                <div class="task-meta">Amanhã · Cuidados com Plantas</div>
+                            </div>
+                        </div>
+                        <div class="task-actions">
+                            <button class="btn btn-success"><i class="fas fa-check"></i></button>
+                            <button class="btn btn-outline"><i class="fas fa-edit"></i></button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card task-list">
+                    <div class="card-header">
+                        <div class="card-title">Tarefas Concluídas</div>
+                        <button class="btn btn-outline">Limpar histórico</button>
+                    </div>
+                    
+                    <div class="task-item">
+                        <div class="task-info">
+                            <div>
+                                <div class="task-title">Lavar a louça</div>
+                                <div class="task-meta">Concluído hoje por João</div>
+                            </div>
+                        </div>
+                        <div class="task-actions">
+                            <button class="btn btn-outline"><i class="fas fa-redo"></i></button>
+                        </div>
+                    </div>
+                    
+                    <div class="task-item">
+                        <div class="task-info">
+                            <div>
+                                <div class="task-title">Levar o lixo</div>
+                                <div class="task-meta">Concluído ontem por Maria</div>
+                            </div>
+                        </div>
+                        <div class="task-actions">
+                            <button class="btn btn-outline"><i class="fas fa-redo"></i></button>
+                        </div>
+                    </div>
+                    
+                    <div class="task-item">
+                        <div class="task-info">
+                            <div>
+                                <div class="task-title">Trocar a roupa de cama</div>
+                                <div class="task-meta">Concluído ontem por Ana</div>
+                            </div>
+                        </div>
+                        <div class="task-actions">
+                            <button class="btn btn-outline"><i class="fas fa-redo"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Modal Nova Tarefa -->
+    <div class="modal" id="taskModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Nova Tarefa</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="taskTitle">Título da Tarefa</label>
+                    <input type="text" id="taskTitle" class="form-control" placeholder="Ex: Lavar a louça">
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskCategory">Categoria</label>
+                    <select id="taskCategory" class="form-control">
+                        <option value="">Selecione uma categoria</option>
+                        <option value="1">Limpeza do Banheiro</option>
+                        <option value="2">Cuidados com Idosos</option>
+                        <option value="3">Cuidados com Bebês</option>
+                        <option value="4">Cuidados com Animais</option>
+                        <option value="5">Cuidados com Plantas</option>
+                        <option value="6">Lavanderia</option>
+                        <option value="7">Cozinha</option>
+                        <option value="8">Manutenção Geral</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskPriority">Prioridade</label>
+                    <select id="taskPriority" class="form-control">
+                        <option value="1">Alta</option>
+                        <option value="2" selected>Média</option>
+                        <option value="3">Baixa</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskRecurrence">Recorrência</label>
+                    <select id="taskRecurrence" class="form-control">
+                        <option value="1">Diária</option>
+                        <option value="2">Semanal</option>
+                        <option value="3">Quinzenal</option>
+                        <option value="4">Mensal</option>
+                        <option value="5" selected>Sob Demanda</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskDueDate">Data Limite</label>
+                    <input type="date" id="taskDueDate" class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskAssignee">Responsável</label>
+                    <select id="taskAssignee" class="form-control">
+                        <option value="">Auto-atribuir</option>
+                        <option value="1">João</option>
+                        <option value="2">Maria</option>
+                        <option value="3">Ana (Cuidadora)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskValue">Valor em Moedas</label>
+                    <input type="number" id="taskValue" class="form-control" value="10">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline close-modal">Cancelar</button>
+                <button class="btn btn-primary">Salvar Tarefa</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Modal functionality
+        const modal = document.getElementById('taskModal');
+        const openModalBtn = document.getElementById('newTaskBtn');
+        const closeModalBtns = document.querySelectorAll('.close-modal');
+        
+        openModalBtn.addEventListener('click', () => {
+            modal.style.display = 'flex';
+        });
+        
+        closeModalBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+        });
+        
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
