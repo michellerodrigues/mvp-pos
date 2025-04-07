@@ -109,7 +109,39 @@ function criarComponenteTarefas(categoria, tarefas, posX = 0, posY = 0) {
 
 // Carregar Tarefas Usuario
 
-export function carregarTarefasUsuario() {
+export async function carregarTarefasUsuario()
+{
+    try {
+        const response = await fetch('http://127.0.0.1:8002/api/categorias/', {
+            mode: 'cors', // Padrão, pode omitir
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          });
+
+        if (!response.ok) {
+            throw new Error('Erro na requisição');
+        }
+        const tarefas_usuario = await response.json();
+
+        tarefas_usuario.forEach((listaTarefas, index) => {
+                // Posicionar tabelas em locais diferentes
+                console.log('lista tarefas recebidas', listaTarefas);
+                console.log('lista tarefas index', index);
+                const posX = 50 + (index * 320);
+                const posY = 50 + (index * 50);
+                criarComponenteTarefas(listaTarefas.categoria, listaTarefas.tarefas, posX, posY);
+            });
+
+    //    return data;
+    } catch (error) {
+        console.error('Erro ao buscar dados:', error);
+        return [];
+    }
+
+}
+
+export function carregarTarefasUsuario_old() {
     
     const mockAPI = {
         fetchData: () => Promise.resolve({

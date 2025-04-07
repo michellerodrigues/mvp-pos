@@ -11,6 +11,8 @@ class TarefaCreate(TarefaBase):
 
 class Tarefa(TarefaBase):
     id: int
+    #v: bool  # Representa 'concluida' no modelo
 
     class Config:
         orm_mode = True
+        #fields = {'v': 'concluida'}  # Mapeia 'concluida' para 'v' no JSON/

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário Interativo</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --card-size: 200px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background-color: #f5f6fa;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .form-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            padding: 30px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .step {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(var(--card-size), 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .card {
+            background: #fff;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            min-height: var(--card-size);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--secondary-color);
+        }
+
+        .card.selected {
+            border-color: var(--secondary-color);
+            background-color: #f0f8ff;
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .prev-btn {
+            background-color: #bdc3c7;
+            color: white;
+        }
+
+        .next-btn {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .progress-bar {
+            height: 8px;
+            background-color: #eee;
+            border-radius: 4px;
+            margin-bottom: 30px;
+        }
+
+        .progress {
+            height: 100%;
+            background-color: var(--secondary-color);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div class="progress-bar">
+            <div class="progress" style="width: 33%"></div>
+        </div>
+
+        <!-- Passo 1 -->
+        <div class="step active" data-step="1">
+            <h2>Qual é o seu objetivo principal?</h2>
+            <div class="cards-container">
+                <div class="card" data-value="fitness">
+                    🏋️♀️ Fitness
+                </div>
+                <div class="card" data-value="nutricao">
+                    🥑 Nutrição
+                </div>
+                <div class="card" data-value="saude">
+                    💊 Saúde
+                </div>
+            </div>
+        </div>
+
+        <!-- Passo 2 -->
+        <div class="step" data-step="2">
+            <h2>Com que frequência você pratica atividades físicas?</h2>
+            <div class="cards-container">
+                <div class="card" data-value="diariamente">
+                    🗓️ Diariamente
+                </div>
+                <div class="card" data-value="semanalmente">
+                    📅 Semanalmente
+                </div>
+                <div class="card" data-value="raramente">
+                    ⏳ Raramente
+                </div>
+            </div>
+        </div>
+
+        <!-- Passo 3 -->
+        <div class="step" data-step="3">
+            <h2>Qual é a sua faixa etária?</h2>
+            <div class="cards-container">
+                <div class="card" data-value="18-25">
+                    18-25 anos
+                </div>
+                <div class="card" data-value="26-35">
+                    26-35 anos
+                </div>
+                <div class="card" data-value="36+">
+                    36+ anos
+                </div>
+            </div>
+        </div>
+
+        <div class="navigation-buttons">
+            <button class="prev-btn" onclick="previousStep()" style="display: none;">
+                Voltar
+            </button>
+            <button class="next-btn" onclick="nextStep()">
+                Próximo
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 3;
+        const answers = {};
+
+        function updateProgress() {
+            const progress = (currentStep / totalSteps) * 100;
+            document.querySelector('.progress').style.width = `${progress}%`;
+        }
+
+        function updateButtons() {
+            const prevButton = document.querySelector('.prev-btn');
+            const nextButton = document.querySelector('.next-btn');
+            
+            prevButton.style.display = currentStep === 1 ? 'none' : 'block';
+            nextButton.textContent = currentStep === totalSteps ? 'Enviar' : 'Próximo';
+        }
+
+        function nextStep() {
+            if (currentStep < totalSteps) {
+                document.querySelector(`[data-step="${currentStep}"]`).classList.remove('active');
+                currentStep++;
+                document.querySelector(`[data-step="${currentStep}"]`).classList.add('active');
+                updateProgress();
+                updateButtons();
+            } else {
+                // Lógica de envio do formulário
+                alert('Formulário completo! Respostas: ' + JSON.stringify(answers));
+            }
+        }
+
+        function previousStep() {
+            if (currentStep > 1) {
+                document.querySelector(`[data-step="${currentStep}"]`).classList.remove('active');
+                currentStep--;
+                document.querySelector(`[data-step="${currentStep}"]`).classList.add('active');
+                updateProgress();
+                updateButtons();
+            }
+        }
+
+        // Lógica de seleção de cards
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('click', function() {
+                // Remove seleção de outros cards no mesmo passo
+                this.parentElement.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+                
+                this.classList.add('selected');
+                const step = this.closest('.step').dataset.step;
+                answers[`step${step}`] = this.dataset.value;
+            });
+        });
+    </script>
+</body>
+</html>
