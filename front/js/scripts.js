@@ -2,14 +2,6 @@ document.addEventListener("DOMContentLoaded", function() {
     console.log("O documento está pronto! scripts");
 });
 
-/*
-  --------------------------------------------------------------------------------------
-  Função para obter a lista existente do servidor via requisição GET
-  // Mock de API
-  --------------------------------------------------------------------------------------
-*/
-
-
 function criarComponenteTarefas(categoria, tarefas, posX = 0, posY = 0) {
     // Criar container
     const container = document.createElement('div');
@@ -56,14 +48,18 @@ function criarComponenteTarefas(categoria, tarefas, posX = 0, posY = 0) {
             <tbody>
                 ${tarefas.map(tarefa => `
                     <tr>
-                        <td>${tarefa.nome}</td>
+                        <td>${tarefa.descricao}</td>
                         <td>
-                            <button 
-                                class="toggle-btn ${tarefa.v ? 'on' : 'off'}"
-                                onclick="toggleStatus(${tarefa.id}, ${!tarefa.v})"
-                            >
-                                ${tarefa.v ? 'ON' : 'OFF'}
-                            </button>
+                            <div class="custom-control custom-switch">
+                                <input 
+                                    type="checkbox" 
+                                    class="custom-control-input" 
+                                    id="customSwitch${tarefa.id}"
+                                    onclick="salvarExecucao(${tarefa.id}, this.checked)"
+                                    checked
+                                >
+                                <label class="custom-control-label" for="customSwitch${tarefa.id}"></label>
+                            </div>
                         </td>
                     </tr>
                 `).join('')}
@@ -124,58 +120,18 @@ export async function carregarTarefasUsuario()
         }
         const tarefas_usuario = await response.json();
 
-        tarefas_usuario.forEach((listaTarefas, index) => {
+        tarefas_usuario.forEach((categoria, index) => {
                 // Posicionar tabelas em locais diferentes
-                console.log('lista tarefas recebidas', listaTarefas);
+                console.log('lista tarefas recebidas', categoria);
                 console.log('lista tarefas index', index);
                 const posX = 50 + (index * 320);
                 const posY = 50 + (index * 50);
-                criarComponenteTarefas(listaTarefas.categoria, listaTarefas.tarefas, posX, posY);
+                criarComponenteTarefas(categoria.nome, categoria.tarefas, posX, posY);
             });
 
-    //    return data;
     } catch (error) {
         console.error('Erro ao buscar dados:', error);
         return [];
     }
 
-}
-
-export function carregarTarefasUsuario_old() {
-    
-    const mockAPI = {
-        fetchData: () => Promise.resolve({
-            data: 
-                [ 
-                    {
-                        categoria: "Tarefas da Cozinha",
-                        tarefas: [
-                            { id: 1, nome: "Lavar louça", v: true },
-                            { id: 2, nome: "Comprar frutas", v: false }
-                        ]
-                    },
-                    {
-                        categoria: "Tarefas do Escritório",
-                        tarefas: [
-                            { id: 3, nome: "Relatório mensal", v: true },
-                            { id: 4, nome: "Reunião com equipe", v: false }
-                        ]
-                    }
-                ]
-        }),
-        
-        updateItem: (id, newStatus) => {
-            console.log(`PUT /items/${id}`, { v: newStatus });
-            return Promise.resolve({ success: true });
-        }
-    };
-    
-    mockAPI.fetchData().then(response => {
-        response.data.forEach((categoria, index) => {
-            // Posicionar tabelas em locais diferentes
-            const posX = 50 + (index * 320);
-            const posY = 50 + (index * 50);
-            criarComponenteTarefas(categoria.categoria, categoria.tarefas, posX, posY);
-        });
-    });
 }

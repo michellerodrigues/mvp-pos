@@ -1,8 +1,9 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, Float
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer
 from database.database import Base
 
-# Modelo base para reutilização
 class BaseModel(Base):
     __abstract__ = True
     id = Column(Integer, primary_key=True, index=True)
+
+class CompositeKeyBase(Base):
+    __abstract__ = True

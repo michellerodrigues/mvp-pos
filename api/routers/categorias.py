@@ -43,35 +43,7 @@ def ler_categoria(categoria_id: int, db: Session = Depends(get_db)):
     return db_categoria
 
 
-from typing import List, Dict, Any
-from fastapi.encoders import jsonable_encoder
-
-@router.get("/categoriasx/")
-def listar_categorias(db: Session = Depends(get_db)):
-    categorias = db.query(CategoriaModel).options(
-        joinedload(CategoriaModel.tarefas)
-    ).all()
-    
-    if not categorias:
-        raise HTTPException(status_code=404, detail="Nenhuma categoria encontrada")
-    
-    response = []
-    for categoria in categorias:
-        categoria_dict = {
-            "categoria": categoria.nome,
-            "tarefas": [
-                {
-                    "id": tarefa.id,
-                    "nome": tarefa.nome,
-                    "v": tarefa.concluida
-                } for tarefa in categoria.tarefas
-            ]
-        }
-        response.append(categoria_dict)
-    
-    return response
-
-@router.get("/categorias/", response_model=List[CategoriaSchema])
+""" @router.get("/categorias/", response_model=List[CategoriaSchema])
 def listar_categorias(db: Session = Depends(get_db)):
     # Carrega categorias com suas tarefas em uma única consulta
     categorias = db.query(CategoriaModel).options(
@@ -84,4 +56,4 @@ def listar_categorias(db: Session = Depends(get_db)):
             detail="Nenhuma categoria encontrada"
         )
     
-    return categorias
+    return categorias """
